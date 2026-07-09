@@ -3,8 +3,14 @@ Website Visitor Counter — AWS Lambda Function
 
 Runtime: Python 3.12
 
-Invoked by API Gateway (HTTP API, GET /visitor-count). Atomically increments
-the visitor count stored in DynamoDB and returns the latest value as JSON:
+Invoked by API Gateway (HTTP API, GET /visitor-count).
+
+Two modes, selected by the ?mode query parameter:
+  - default          → atomically increments the count and returns it
+  - ?mode=read       → returns the current count WITHOUT incrementing
+                       (used by the read-only dashboard page)
+
+Response JSON in both modes:
 
     { "visits": 25 }
 
@@ -70,26 +76,40 @@ def lambda_handler(event, context):
             "body": json.dumps({"message": "CORS preflight OK"}),
         }
 
-    # --- Increment the counter atomically ---------------------------------
+    # --- Determine mode from query string ----------------------------------
+    # ?mode=read → return the count without incrementing (dashboard page)
+    query_params = event.get("queryStringParameters") or {}
+    read_only = query_params.get("mode") == "read"
+
     try:
-        response = table.update_item(
-            Key={"counterId": COUNTER_ID},
-            # Atomic counter: ADD creates the attribute (and the item)
-            # if it doesn't exist yet, starting from 0.
-            UpdateExpression="ADD visits :inc",
-            ExpressionAttributeValues={":inc": 1},
-            ReturnValues="UPDATED_NEW",
-        )
+        if read_only:
+            # --- Read the current count (no increment) --------------------
+            response = table.get_item(Key={"counterId": COUNTER_ID})
+            item = response.get("Item")
+            # If no visit has ever been recorded, the item won't exist yet
+            visits = int(item["visits"]) if item and "visits" in item else 0
 
-        # DynamoDB returns numbers as Decimal — convert to int for JSON
-        updated_visits = int(response["Attributes"]["visits"])
+            logger.info("Read-only request: current count is %d", visits)
+        else:
+            # --- Increment the counter atomically --------------------------
+            response = table.update_item(
+                Key={"counterId": COUNTER_ID},
+                # Atomic counter: ADD creates the attribute (and the item)
+                # if it doesn't exist yet, starting from 0.
+                UpdateExpression="ADD visits :inc",
+                ExpressionAttributeValues={":inc": 1},
+                ReturnValues="UPDATED_NEW",
+            )
 
-        logger.info("Visitor count incremented to %d", updated_visits)
+            # DynamoDB returns numbers as Decimal — convert to int for JSON
+            visits = int(response["Attributes"]["visits"])
+
+            logger.info("Visitor count incremented to %d", visits)
 
         return {
             "statusCode": 200,
             "headers": CORS_HEADERS,
-            "body": json.dumps({"visits": updated_visits}),
+            "body": json.dumps({"visits": visits}),
         }
 
     except ClientError as error:

@@ -1,15 +1,23 @@
 /**
  * Website Visitor Counter — Frontend Logic
  *
- * On page load, this script calls the API Gateway endpoint, which invokes
- * an AWS Lambda function that atomically increments the visitor count in
- * DynamoDB and returns the latest value.
+ * Shared by both pages:
+ *   - visit.html  → "increment" mode: counts the visit, then shows the total
+ *   - index.html  → "read" mode: shows the total WITHOUT counting a visit
+ *
+ * Each page sets its mode before loading this script:
+ *   <script>window.COUNTER_MODE = "read";</script>
+ * If no mode is set, "increment" is the default.
  *
  * Replace API_URL below with your deployed API Gateway invoke URL, e.g.:
  * https://abc123xyz.execute-api.us-east-1.amazonaws.com/visitor-count
+ * (NOT the S3 website URL — it must be the execute-api URL.)
  */
 
 const API_URL = "PASTE_API_GATEWAY_URL";
+
+// "read" = display only, "increment" = count this page view
+const PAGE_MODE = window.COUNTER_MODE === "read" ? "read" : "increment";
 
 // How long to wait for the API before giving up (milliseconds)
 const REQUEST_TIMEOUT_MS = 10000;
@@ -40,8 +48,9 @@ function showError() {
 }
 
 /**
- * Fetch the latest visitor count from the API Gateway endpoint.
- * Uses AbortController so a hung request doesn't leave the spinner forever.
+ * Fetch the visitor count from the API Gateway endpoint.
+ * In "read" mode a ?mode=read query parameter tells the Lambda
+ * to return the count without incrementing it.
  */
 async function fetchVisitorCount() {
     // Guard: warn clearly if the API URL was never configured
@@ -53,12 +62,26 @@ async function fetchVisitorCount() {
         return;
     }
 
+    // Guard: catch the common mistake of pasting the S3 website URL
+    if (API_URL.includes(".s3.") || API_URL.includes("s3-website")) {
+        console.error(
+            "API_URL points to S3, not API Gateway. Use the execute-api invoke URL, " +
+            "e.g. https://abc123.execute-api.us-east-1.amazonaws.com/visitor-count"
+        );
+        showError();
+        return;
+    }
+
+    const requestUrl =
+        PAGE_MODE === "read" ? `${API_URL}?mode=read` : API_URL;
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
-        const response = await fetch(API_URL, {
+        const response = await fetch(requestUrl, {
             method: "GET",
+            cache: "no-store", // never serve a stale cached count
             signal: controller.signal,
         });
 

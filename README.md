@@ -8,14 +8,20 @@ A beginner-friendly serverless mini project. A static website displays a live vi
 
 ## Project Overview
 
+**Two pages:**
+
+- **`visit.html` — the tracked page.** Every visit increments the counter (like a real website page with analytics).
+- **`index.html` — the dashboard.** Displays the total count *without* incrementing it (calls the API with `?mode=read`).
+
 **How it works:**
 
-1. A visitor opens the static webpage.
+1. A visitor opens `visit.html`.
 2. JavaScript (`script.js`) calls the API Gateway endpoint using `fetch()`.
 3. API Gateway invokes the Lambda function.
 4. Lambda performs an atomic `ADD visits :inc` update on the DynamoDB table (creating the item automatically if it doesn't exist).
 5. Lambda returns `{ "visits": <number> }`.
-6. The webpage displays the updated count (or **Counter unavailable** if the API fails).
+6. The page displays the updated count (or **Counter unavailable** if the API fails).
+7. Opening `index.html` shows the same count read-only — refreshing the dashboard never inflates the number.
 
 **AWS services used:** API Gateway (HTTP API), Lambda (Python 3.12), DynamoDB, S3 (optional static hosting).
 
@@ -47,9 +53,10 @@ Amazon DynamoDB  (WebsiteVisitorCounter table)
 visitor-counter/
 │
 ├── frontend/
-│   ├── index.html          # Webpage markup
+│   ├── index.html          # Dashboard — shows count (read-only)
+│   ├── visit.html          # Tracked page — visiting increments count
 │   ├── styles.css          # Responsive, modern card UI
-│   └── script.js           # Calls the API and renders the count
+│   └── script.js           # Shared logic for both pages
 │
 ├── lambda/
 │   ├── lambda_function.py  # Lambda handler (Python 3.12)
@@ -206,7 +213,7 @@ To host the frontend publicly on S3:
 
 1. Open the **S3** console → **Create bucket** (e.g., `my-visitor-counter-site`). Bucket names must be globally unique.
 2. Uncheck **Block all public access** and acknowledge the warning.
-3. Upload `index.html`, `styles.css`, and `script.js` from the `frontend/` folder.
+3. Upload `index.html`, `visit.html`, `styles.css`, and `script.js` from the `frontend/` folder.
 4. In **Properties → Static website hosting**, click **Edit**:
    - **Enable** static website hosting
    - **Index document:** `index.html`
@@ -248,7 +255,17 @@ python -m http.server
 
 Then open [http://localhost:8000](http://localhost:8000).
 
-Each page refresh should increase the counter by 1. If the API URL is missing or the request fails, the page shows **Counter unavailable**.
+- Open **visit.html** and refresh — each refresh increments the counter by 1.
+- Open **index.html** (the dashboard) and refresh — the count stays the same; it only displays the total.
+
+You can also test both modes directly with curl:
+
+```bash
+curl "https://<api-id>.execute-api.<region>.amazonaws.com/visitor-count"            # increments
+curl "https://<api-id>.execute-api.<region>.amazonaws.com/visitor-count?mode=read"  # read-only
+```
+
+If the API URL is missing or the request fails, the page shows **Counter unavailable**.
 
 ---
 

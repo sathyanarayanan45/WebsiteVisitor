@@ -124,6 +124,33 @@ body {
     color: var(--color-error);
 }
 
+/* ---- Note text (visit.html) ---- */
+.card-note {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+}
+
+/* ---- Navigation button between pages ---- */
+.button {
+    display: inline-block;
+    padding: 0.65rem 1.4rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #0f2027;
+    text-decoration: none;
+    background: var(--color-accent);
+    border-radius: 999px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(79, 209, 197, 0.35);
+}
+
 /* ---- Footer ---- */
 .card-footer {
     font-size: 0.75rem;

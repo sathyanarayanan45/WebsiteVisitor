@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Website Visitor Counter powered by AWS Lambda and DynamoDB" />
-    <title>Website Visitor Counter</title>
+    <meta name="description" content="Tracked page — every visit here increments the counter" />
+    <title>Welcome — Tracked Page</title>
     <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -15,20 +15,18 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                      fill="none" stroke="currentColor" stroke-width="2"
                      stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
                 </svg>
             </div>
 
-            <h1 class="card-title">Website Visitor Counter</h1>
-            <p class="card-subtitle">Total Visitors</p>
-            <!-- This dashboard only DISPLAYS the count. Visits are counted
-                 on visit.html — open it to increment the counter. -->
+            <h1 class="card-title">Welcome to Our Website!</h1>
+            <p class="card-subtitle">You are visitor number</p>
 
             <!-- Counter display area -->
             <div class="counter-wrapper">
                 <!-- Loading spinner (visible while fetching) -->
-                <div id="loader" class="loader" role="status" aria-label="Loading visitor count"></div>
+                <div id="loader" class="loader" role="status" aria-label="Recording your visit"></div>
 
                 <!-- Visitor count (populated by script.js) -->
                 <p id="visitor-count" class="counter hidden" aria-live="polite"></p>
@@ -37,14 +35,18 @@
                 <p id="error-message" class="error hidden">Counter unavailable</p>
             </div>
 
-            <a class="button" href="visit.html">Visit the tracked page →</a>
+            <p class="card-note">
+                Your visit to this page has been counted.
+                Refresh to see the number grow!
+            </p>
+
+            <a class="button" href="index.html">← View the dashboard</a>
 
             <p class="card-footer">Powered by AWS Lambda &amp; DynamoDB</p>
         </div>
     </main>
 
-    <!-- Read-only mode: show the count without incrementing it -->
-    <script>window.COUNTER_MODE = "read";</script>
+    <!-- Default mode ("increment"): this page view is counted -->
     <script src="script.js"></script>
 </body>
 </html>
