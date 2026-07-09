@@ -7,45 +7,53 @@
     <title>Thank You for Visiting!</title>
     <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="visit-theme">
-    <main class="page">
-        <div class="card">
-            <!-- Animated heart icon -->
-            <div class="card-icon visit-icon" aria-hidden="true">
-                <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24"
+<body>
+    <main class="dashboard visit-page">
+
+        <!-- ===== Top bar ===== -->
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true"></span>
+                <span class="brand-name">Website Insights</span>
+            </div>
+            <span class="badge-tracked">Tracked page</span>
+        </header>
+
+        <!-- ===== Thank-you card ===== -->
+        <section class="visit-card">
+            <div class="visit-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24"
                      fill="currentColor" stroke="currentColor" stroke-width="1"
                      stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
             </div>
 
-            <h1 class="card-title">Thank You for Visiting!</h1>
-            <p class="visit-message">
+            <h1 class="visit-title">Thank You for Visiting!</h1>
+            <p class="visit-text">
                 We're glad you stopped by. Your visit means a lot to us.
             </p>
 
-            <div class="visit-divider" aria-hidden="true"></div>
-
-            <!-- Visit confirmation area (count itself is NOT shown here;
-                 see the dashboard on index.html for totals) -->
+            <!-- Visit confirmation area (the count itself lives on the dashboard) -->
             <div class="counter-wrapper">
-                <!-- Loading spinner (visible while recording the visit) -->
-                <div id="loader" class="loader" role="status" aria-label="Recording your visit"></div>
+                <!-- Loading animation (visible while recording the visit) -->
+                <div id="loader" class="loader-bars" role="status" aria-label="Recording your visit">
+                    <span></span><span></span><span></span>
+                </div>
 
                 <!-- Confirmation message (populated by script.js) -->
                 <p id="visitor-count" class="counter hidden" aria-live="polite"></p>
 
-                <!-- Error message (shown if the API request fails) -->
+                <!-- Error message (shown if the API fails) -->
                 <p id="error-message" class="error hidden">Counter unavailable</p>
             </div>
 
-            <a class="button" href="index.html">See total visitors →</a>
+            <a class="button" href="index.html">View live dashboard →</a>
+        </section>
 
-            <p class="card-footer">Powered by AWS Lambda &amp; DynamoDB</p>
-        </div>
     </main>
 
-    <!-- Default mode ("increment"): this page view is counted.
+    <!-- Increment mode: this page view is counted.
          SHOW_COUNT = false: show a confirmation instead of the number. -->
     <script>window.SHOW_COUNT = false;</script>
     <script src="script.js"></script>

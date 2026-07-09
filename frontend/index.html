@@ -3,48 +3,149 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Website Visitor Counter powered by AWS Lambda and DynamoDB" />
-    <title>Website Visitor Counter</title>
+    <meta name="description" content="Website Insights — real-time visitor analytics powered by AWS Lambda and DynamoDB" />
+    <title>Website Insights — Live Dashboard</title>
     <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <main class="page">
-        <div class="card">
-            <!-- Decorative icon -->
-            <div class="card-icon" aria-hidden="true">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                     fill="none" stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                </svg>
+    <main class="dashboard">
+
+        <!-- ===== Top bar ===== -->
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true"></span>
+                <span class="brand-name">Website Insights</span>
             </div>
-
-            <h1 class="card-title">Website Visitor Counter</h1>
-            <p class="card-subtitle">Total Visitors</p>
-            <!-- This dashboard only DISPLAYS the count. Visits are counted
-                 on visit.html — open it to increment the counter. -->
-
-            <!-- Counter display area -->
-            <div class="counter-wrapper">
-                <!-- Loading spinner (visible while fetching) -->
-                <div id="loader" class="loader" role="status" aria-label="Loading visitor count"></div>
-
-                <!-- Visitor count (populated by script.js) -->
-                <p id="visitor-count" class="counter hidden" aria-live="polite"></p>
-
-                <!-- Error message (shown if the API request fails) -->
-                <p id="error-message" class="error hidden">Counter unavailable</p>
+            <div class="topbar-right">
+                <span class="live-badge">
+                    <span class="live-dot" aria-hidden="true"></span>LIVE
+                </span>
+                <span class="updated">
+                    Updated <span id="last-updated">—</span>
+                    · next in <span id="next-refresh">5s</span>
+                </span>
             </div>
+        </header>
 
-            <a class="button" href="visit.html">Visit the tracked page →</a>
+        <!-- Error banner (shown if the API fails before first load) -->
+        <p id="error-message" class="error-banner hidden">Counter unavailable</p>
 
-            <p class="card-footer">Powered by AWS Lambda &amp; DynamoDB</p>
-        </div>
+        <!-- ===== Stat cards row ===== -->
+        <section class="cards">
+            <div class="stat-tile">
+                <p class="tile-label">Visitors</p>
+                <p class="tile-value" id="stat-visits">
+                    <span id="loader" class="loader-inline" aria-label="Loading"></span>
+                </p>
+                <p class="tile-hint">all-time page views</p>
+            </div>
+            <div class="stat-tile">
+                <p class="tile-label">Unique</p>
+                <p class="tile-value" id="stat-unique">—</p>
+                <p class="tile-hint">first-time visitors</p>
+            </div>
+            <div class="stat-tile">
+                <p class="tile-label">Today</p>
+                <p class="tile-value" id="stat-today">—</p>
+                <p class="tile-hint" id="today-date">—</p>
+            </div>
+            <div class="stat-tile">
+                <p class="tile-label">Active</p>
+                <p class="tile-value" id="stat-active">—</p>
+                <p class="tile-hint">visits in last 5 min</p>
+            </div>
+        </section>
+
+        <!-- Hidden element kept for script compatibility -->
+        <span id="visitor-count" class="hidden" aria-hidden="true"></span>
+
+        <!-- ===== Visitors over time ===== -->
+        <section class="panel-block">
+            <p class="block-title">Visitors Over Time <span class="block-sub">last 7 days</span></p>
+            <canvas id="days-chart" width="800" height="180" aria-label="Visitors per day"></canvas>
+        </section>
+
+        <!-- ===== Device pie + Browser bars ===== -->
+        <section class="two-col">
+            <div class="panel-block">
+                <p class="block-title">Device Distribution</p>
+                <div class="pie-wrap">
+                    <canvas id="device-pie" width="150" height="150" aria-label="Device distribution"></canvas>
+                    <ul class="legend" id="device-legend"><li class="muted">No data yet</li></ul>
+                </div>
+            </div>
+            <div class="panel-block">
+                <p class="block-title">Browser Usage</p>
+                <div id="browser-bars" class="bars"><p class="muted">No data yet</p></div>
+            </div>
+        </section>
+
+        <!-- ===== Top pages + Traffic sources ===== -->
+        <section class="two-col">
+            <div class="panel-block">
+                <p class="block-title">Top Pages</p>
+                <ul class="rank-list" id="top-pages"><li class="muted">No data yet</li></ul>
+            </div>
+            <div class="panel-block">
+                <p class="block-title">Traffic Sources</p>
+                <ul class="rank-list" id="traffic-sources"><li class="muted">No data yet</li></ul>
+            </div>
+        </section>
+
+        <!-- ===== Recent visitors ===== -->
+        <section class="panel-block">
+            <p class="block-title">Recent Visitors</p>
+            <div class="table-wrap">
+                <table class="visits-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th><th>Source</th><th>Device</th><th>Browser</th><th>Page</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-body">
+                        <tr><td colspan="5" class="muted">No visits recorded yet</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ===== API health (client-side session metrics) ===== -->
+        <section class="panel-block">
+            <p class="block-title">API Health
+                <span class="block-sub">
+                    <span id="status-dot" class="dot" aria-hidden="true"></span>
+                    <span id="api-status">Connecting…</span>
+                </span>
+            </p>
+            <div class="health-grid">
+                <div><p class="tile-label">Requests</p><p class="health-value" id="health-requests">0</p></div>
+                <div><p class="tile-label">Success</p><p class="health-value metric-good" id="health-success">0</p></div>
+                <div><p class="tile-label">Failed</p><p class="health-value metric-bad" id="health-failed">0</p></div>
+                <div><p class="tile-label">Avg Response</p><p class="health-value" id="health-latency">—</p></div>
+            </div>
+        </section>
+
+        <!-- ===== Footer ===== -->
+        <footer class="foot">
+            <div class="arch">
+                <span class="chip">S3</span>
+                <span class="arrow" aria-hidden="true">→</span>
+                <span class="chip">API Gateway</span>
+                <span class="arrow" aria-hidden="true">→</span>
+                <span class="chip">Lambda</span>
+                <span class="arrow" aria-hidden="true">→</span>
+                <span class="chip">DynamoDB</span>
+            </div>
+            <a class="button" href="visit.html">Open tracked page →</a>
+        </footer>
+
     </main>
 
-    <!-- Read-only mode: show the count without incrementing it -->
-    <script>window.COUNTER_MODE = "read";</script>
+    <!-- Dashboard mode: read-only analytics + live polling -->
+    <script>
+        window.COUNTER_MODE = "read";
+        window.DASHBOARD = true;
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
