@@ -10,8 +10,8 @@ A beginner-friendly serverless mini project. A static website displays a live vi
 
 **Two pages:**
 
-- **`visit.html` — the tracked page.** Every visit increments the counter (like a real website page with analytics).
-- **`index.html` — the dashboard.** Displays the total count *without* incrementing it (calls the API with `?mode=read`).
+- **`visit.html` — the tracked page.** Every visit increments the counter and shows the visitor a thank-you confirmation (the number itself is not shown — just like real analytics).
+- **`index.html` — the dashboard.** The only page that displays the total count, *without* incrementing it (calls the API with `?mode=read`).
 
 **How it works:**
 
@@ -255,8 +255,8 @@ python -m http.server
 
 Then open [http://localhost:8000](http://localhost:8000).
 
-- Open **visit.html** and refresh — each refresh increments the counter by 1.
-- Open **index.html** (the dashboard) and refresh — the count stays the same; it only displays the total.
+- Open **visit.html** and refresh a few times — each refresh records a visit (you'll see a confirmation, not the number).
+- Open **index.html** (the dashboard) — the total reflects those visits; refreshing the dashboard never changes it.
 
 You can also test both modes directly with curl:
 

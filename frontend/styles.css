@@ -181,6 +181,85 @@ body {
     }
 }
 
+/* ==========================================================================
+   Visit page ("thank you") theme — applied via <body class="visit-theme">
+   ========================================================================== */
+
+.visit-theme {
+    /* Warmer purple/pink gradient to distinguish it from the dashboard */
+    background: linear-gradient(135deg, #1a1a2e, #4a1942, #2d1b4e);
+}
+
+.visit-theme .counter,
+.visit-theme .card-icon {
+    color: #f472b6; /* warm pink accent */
+}
+
+.visit-theme .card-icon {
+    background: rgba(244, 114, 182, 0.14);
+}
+
+.visit-theme .button {
+    background: #f472b6;
+    color: #1a1a2e;
+}
+
+.visit-theme .button:hover {
+    box-shadow: 0 8px 20px rgba(244, 114, 182, 0.35);
+}
+
+.visit-theme .loader {
+    border-top-color: #f472b6;
+}
+
+/* Confirmation text on visit.html (replaces the raw count) */
+.counter.confirmation {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #f472b6;
+}
+
+/* Gentle heartbeat animation on the icon */
+.visit-icon {
+    animation: heartbeat 1.6s ease-in-out infinite;
+}
+
+/* Friendly thank-you message under the title */
+.visit-message {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+/* Thin gradient divider between message and counter */
+.visit-divider {
+    width: 60px;
+    height: 3px;
+    margin: 0 auto 1.5rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #f472b6, #a78bfa);
+}
+
+@keyframes heartbeat {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    10% {
+        transform: scale(1.12);
+    }
+    20% {
+        transform: scale(1);
+    }
+    30% {
+        transform: scale(1.08);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
 /* ---- Responsive: small screens ---- */
 @media (max-width: 480px) {
     .card {

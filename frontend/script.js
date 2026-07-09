@@ -28,11 +28,18 @@ const counterElement = document.getElementById("visitor-count");
 const errorElement = document.getElementById("error-message");
 
 /**
- * Show the visitor count and hide the loader / error message.
+ * Show the visitor count (or a simple confirmation) and hide the loader.
+ * Pages that set window.SHOW_COUNT = false (e.g. visit.html) get a
+ * confirmation message instead of the raw number.
  * @param {number} visits - The total visitor count returned by the API.
  */
 function showCount(visits) {
-    counterElement.textContent = visits.toLocaleString();
+    if (window.SHOW_COUNT === false) {
+        counterElement.textContent = "✓ Your visit has been recorded";
+        counterElement.classList.add("confirmation");
+    } else {
+        counterElement.textContent = visits.toLocaleString();
+    }
     loaderElement.classList.add("hidden");
     errorElement.classList.add("hidden");
     counterElement.classList.remove("hidden");
