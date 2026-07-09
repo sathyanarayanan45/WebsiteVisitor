@@ -9,7 +9,7 @@
                 "dynamodb:UpdateItem",
                 "dynamodb:PutItem"
             ],
-            "Resource": "arn:aws:dynamodb:REGION:ACCOUNT_ID:table/WebsiteVisitorCounter"
+            "Resource": "arn:aws:dynamodb:us-east-1:302659227963:table/WebsiteVisitorCounter"
         }
     ]
 }

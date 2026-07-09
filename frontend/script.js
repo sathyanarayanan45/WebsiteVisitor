@@ -14,7 +14,7 @@
  * (NOT the S3 website URL — it must be the execute-api URL.)
  */
 
-const API_URL = "PASTE_API_GATEWAY_URL";
+const API_URL = "https://ndcfh75n8b.execute-api.us-east-1.amazonaws.com/visitor-count";
 
 // "read" = display only, "increment" = count this page view
 const PAGE_MODE = window.COUNTER_MODE === "read" ? "read" : "increment";
