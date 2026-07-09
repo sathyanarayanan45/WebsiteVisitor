@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Website Visitor Counter powered by AWS Lambda and DynamoDB" />
+    <title>Website Visitor Counter</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <main class="page">
+        <div class="card">
+            <!-- Decorative icon -->
+            <div class="card-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            </div>
+
+            <h1 class="card-title">Website Visitor Counter</h1>
+            <p class="card-subtitle">Total Visitors</p>
+
+            <!-- Counter display area -->
+            <div class="counter-wrapper">
+                <!-- Loading spinner (visible while fetching) -->
+                <div id="loader" class="loader" role="status" aria-label="Loading visitor count"></div>
+
+                <!-- Visitor count (populated by script.js) -->
+                <p id="visitor-count" class="counter hidden" aria-live="polite"></p>
+
+                <!-- Error message (shown if the API request fails) -->
+                <p id="error-message" class="error hidden">Counter unavailable</p>
+            </div>
+
+            <p class="card-footer">Powered by AWS Lambda &amp; DynamoDB</p>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

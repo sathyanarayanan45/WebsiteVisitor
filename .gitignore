@@ -1,0 +1,30 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# ---- Node (in case tooling is added later) ----
+node_modules/
+
+# ---- Lambda deployment packages ----
+*.zip
+
+# ---- Environment / secrets ----
+.env
+.env.*
+*.pem
+
+# ---- Editor / IDE ----
+.vscode/
+.idea/
+*.swp
+
+# ---- OS files ----
+.DS_Store
+Thumbs.db
+
+# ---- AWS local config (never commit credentials) ----
+.aws/
